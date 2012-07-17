@@ -1,0 +1,18 @@
+{
+    "name": "mySite-jscdn",
+    "description": "A simple github post-receive hook to minify and serve js",
+    "author": "Abhishek Munie",
+    "version": "0.1.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/abhishekmunie/mySite-jscdn.git"
+    },
+    "engines": {
+        "node": ">= 0.6.0"
+    },
+    "main": "server.js",
+    "dependencies": {
+        "express": "latest"
+    },
+    "devDependencies": {}
+}
