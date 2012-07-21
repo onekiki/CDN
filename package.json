@@ -12,6 +12,7 @@
     },
     "main": "server.js",
     "dependencies": {
+        "npm": "latest",
         "express": "latest"
     },
     "devDependencies": {}
