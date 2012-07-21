@@ -139,13 +139,14 @@ var githubhook = function(port, sites, callback) {
 var callback = function(err, payload) {
     if (!err) {
         console.log(payload); // payload is the JSON blob that github POSTs to the server
+        refreshCache();
     } else {
         console.log(err);
     }
 }
 
 var gitservers = {
-    'supersecretpath': 'https://github.com/mySite/mySite-js'
+    'mySite-js': 'https://github.com/mySite/mySite-js'
 };
 
 var app = express.createServer();
@@ -170,23 +171,21 @@ app.post('/:id', function(req, res) {
     }
 });
 
-app.get('/',function(request, response) {
-    if (request.url == "/?clear") {
+app.get('/:id',function(request, response) {
+    if (request.params.id == "?clear") {
         refreshCache();
         return;
     }
-    var url = "https://raw.github.com/mySite/mySite-js/master" + request.url;
+    var url = "http://js-raw.abhishekmunie.com/" + request.params.id;
+    console.log(url);
     if (codeCache[url]) {
-        response.writeHead(200, {
-            'Content-Type': 'application/javascript'
-        });
-        response.end(codeCache[url]);
+        response.header('Content-Type', 'application/javascript');
+        response.send(codeCache[url], {'Content-Type': 'application/javascript'}, 200);
     } else compile(url, function(err, code) {
-        if (err) throw err;
-        response.writeHead(200, {
-            'Content-Type': 'application/javascript'
-        });
-        response.end(code);
+        if (err) {
+            console.log(err);
+        }
+        response.send(code, {'Content-Type': 'application/javascript'}, 200);
         codeCache[url] = code;
     });
 });
