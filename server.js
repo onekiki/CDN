@@ -1,4 +1,4 @@
-var sys = require('sys'),
+var sys = require('util'),
     qs = require('querystring'),
     http = require('http'),
     express = require('express');
@@ -103,39 +103,6 @@ function refreshCache() {
 }
 setInterval(refreshCache, 3600000);
 
-/*
-var githubhook = function(port, sites, callback) {
-        if (!(this instanceof githubhook)) return new githubhook(port, sites, callback);
-        var self = this;
-        self.port = port;
-        self.callback = callback;
-        self.sites = sites;
-
-        self.listener = express.createServer();
-        self.listener.use(express.bodyParser());
-        self.listener.post('/:id', function(req, res) {
-            if ((Object.keys(self.sites).indexOf(req.params.id) === -1) || (req.headers['x-github-event'] !== 'push')) {
-                callback(new Error('Posted data does not appear to be a github event'));
-                res.end();
-            } else {
-                var payload;
-                if (typeof req.body.payload === 'object') {
-                    payload = req.body.payload;
-                } else {
-                    payload = JSON.parse(req.body.payload);
-                }
-                if (payload.repository.url === self.sites[req.params.id]) {
-                    callback(null, payload);
-                } else {
-                    callback(new Error('Posted URL does not match configuration'));
-                }
-                res.end();
-            }
-        });
-        self.listener.listen(port);
-    };
-*/
-
 var callback = function(err, payload) {
     if (!err) {
         console.log(payload); // payload is the JSON blob that github POSTs to the server
@@ -171,17 +138,18 @@ app.post('/:id', function(req, res) {
     }
 });
 
-app.get('/:id',function(request, response) {
+app.get('/*.js',function(request, response) {
     if (request.params.id == "?clear") {
         refreshCache();
         return;
     }
-    var url = "http://js-raw.abhishekmunie.com/" + request.params.id;
-    console.log(url);
+    var url = "http://js-raw.abhishekmunie.com/" + request.params[0] + ".js";
+    console.log("url: "+url);
     if (codeCache[url]) {
         response.header('Content-Type', 'application/javascript');
         response.send(codeCache[url], {'Content-Type': 'application/javascript'}, 200);
     } else compile(url, function(err, code) {
+        console.log(code);
         if (err) {
             console.log(err);
         }
